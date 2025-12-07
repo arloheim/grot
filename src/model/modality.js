@@ -1,11 +1,13 @@
+import Record from "./record.js";
+
+
 // Class that defines a modality in a feed
-export default class Modality
+export default class Modality extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
-
-    this.id = data.id;
+  constructor(feed, id, data) {
+    super(feed, "modalities", id);
+    
     this.name = data.name;
     this.nodeName = data.nodeName;
     this.abbr = data.abbr;

@@ -1,12 +1,14 @@
+import Record from "./record.js";
+
+
 // Class that defines a notification in a feed
-export default class Notification
+export default class Notification extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
+  constructor(feed, id, data) {
+    super(feed, "notifications", id);
 
     this.type = data.type;
-    this.id = data.id;
     this.name = data.name ?? this.type?.name;
     this.description = data.description;
     this.period = data.period;

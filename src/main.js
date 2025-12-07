@@ -15,19 +15,13 @@ async function main() {
     const feed = await parseFeed(logger, './data');
 
     // Log the feed information
-    logger.info(`- ${feed.agencies.length} agencies defined`);
-    logger.info(`- ${feed.modalities.length} modalities defined`);
-    logger.info(`- ${feed.nodes.length} nodes defined`);
-    logger.info(`- ${feed.transfers.length} transfers defined`);
-    logger.info(`- ${feed.routes.length} routes defined`);
-    logger.info(`- ${feed.services.length} services defined`);
-    logger.info(`- ${feed.nodeServices.length} node services defined`);
-    logger.info(`- ${feed.routeServices.length} route services defined`);
-    logger.info(`- ${feed.notificationTypes.length} notification types defined`);
-    logger.info(`- ${feed.notifications.length} notifications defined`);
+    logger.info(`Loaded transit feed version ${feed.version} published by ${feed.publisherName}${feed.publisherUrl !== undefined ? ` <${feed.publisherUrl}>` : ""}`)
+    logger.info(`- Required files: ${feed.agencies.size} agencies, ${feed.modalities.size} modalities, ${feed.nodes.size} nodes, ${feed.routes.size} routes`);
+    logger.info(`- Optional files: ${feed.services.size} services, ${feed.nodeServices.size} node services, ${feed.routeServices.size} route services, ${feed.notificationTypes.size} notification types, ${feed.notifications.size} notifications`);
+    logger.info(`- Language: "${feed.language}"${Object.keys(feed.translations).length > 0 ? `; Translations: ${Object.keys(feed.translations).map(id => `"${id}"`).join(", ")}` : ""}`);
 
     // Create the app
-    const app = createApp(logger);
+    const app = createApp(logger, feed);
 
     // Run the server
     const server = http.createServer(app);

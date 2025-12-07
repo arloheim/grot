@@ -17,8 +17,8 @@
     "cors": "~2.8.5",
     "express": "~5.2.1",
     "http-errors": "~2.0.1",
+    "js-toml": "~1.0.2",
     "minisearch": "~7.2.0",
-    "toml": "^3.0.0",
     "winston": "~3.18.3"
   },
   "devDependencies": {

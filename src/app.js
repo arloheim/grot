@@ -31,10 +31,11 @@ export function createLogger() {
 }
 
 // Create the Express app
-export function createApp(logger) {
+export function createApp(logger, feed) {
   // Create the app
   const app = express();
   app.locals.logger = logger;
+  app.locals.feed = feed;
 
   // Add the middlewares to the app
   app.use(logRequest(logger));

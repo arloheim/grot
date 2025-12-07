@@ -28,7 +28,7 @@ export function createNotificationsRouter(app) {
   // Add the list notifications route
   router.get('/', catchError(async function(req, res, next) {
     // Get the notifications
-    const notifications = app.locals.feed.notifications;
+    const notifications = app.locals.feed.getNotifications();
 
     // Respond with the notifications
     return res.json(notifications.map(notification => notification.toJSON()));

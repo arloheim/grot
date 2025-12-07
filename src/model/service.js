@@ -1,11 +1,13 @@
+import Record from "./record.js";
+
+
 // Class that defines a service in a feed
-export default class Service
+export default class Service extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
-
-    this.id = data.id;
+  constructor(feed, id, data) {
+    super(feed, "services", id);
+    
     this.name = data.name;
     this.icon = data.icon;
     this.color = data.color;

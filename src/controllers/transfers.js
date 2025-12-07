@@ -28,7 +28,7 @@ export function createTransfersRouter(app) {
   // Add the list transfers route
   router.get('/', catchError(async function(req, res, next) {
     // Get the transfers
-    const transfers = app.locals.feed.transfers;
+    const transfers = app.locals.feed.getTransfers();
 
     // Respond with the transfers
     return res.json(transfers.map(transfer => transfer.toJSON()));

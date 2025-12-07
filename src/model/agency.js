@@ -1,22 +1,24 @@
+import Record from "./record.js";
+
+
 // Class that defines an agency in a feed
-export default class Agency
+export default class Agency extends Record
 {
   // Constructor
-  constructor(feed, props) {
-    this._feed = feed;
-
-    this.id = props.id;
-    this.name = props.name;
-    this.abbr = props.abbr;
-    this.description = props.description;
-    this.url = props.url;
-    this.icon = props.icon;
+  constructor(feed, id, data) {
+    super(feed, "agencies", id);
+    
+    this.name = data.name;
+    this.abbr = data.abbr;
+    this.description = data.description;
+    this.url = data.url;
+    this.icon = data.icon;
   }
 
 
   // Return the routes of the agency
   get routes() {
-    return this._feed.routes.filter(route => route.agency.id === this.id);
+    return this._feed.getRoutes().filter(route => route.agency.id === this.id);
   }
 
 

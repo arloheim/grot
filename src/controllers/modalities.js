@@ -28,7 +28,7 @@ export function createModalityRouter(app) {
   // Add the list modalities route
   router.get('/', catchError(async function(req, res, next) {
     // Get the modalities
-    const modalities = app.locals.feed.modalities;
+    const modalities = app.locals.feed.getModalities();
 
     // Respond with the modalities
     return res.json(modalities.map(modality => modality.toJSON()));

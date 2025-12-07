@@ -28,7 +28,7 @@ export function createAgencyRouter(app) {
   // Add the list agencies route
   router.get('/', catchError(async function(req, res, next) {
     // Get the agencies
-    const agencies = app.locals.feed.agencies;
+    const agencies = app.locals.feed.getAgencies();
 
     // Respond with the agencies
     return res.json(agencies.map(agency => agency.toJSON()));

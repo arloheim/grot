@@ -1,18 +1,19 @@
+import Record from "./record.js";
+
+
 // Class that defines a transfer in a feed
-export default class Transfer
+export default class Transfer extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
-
-    this.id = data.id;
+  constructor(feed, id, data) {
+    super(feed, "transfers", id);
+    
     this.between = data.between;
     this.and = data.and;
     this.time = data.time;
     this.direct = data.direct ?? true;
     this.icon = data.icon ?? 'person-walking';
 
-    this.oppositeNode = undefined;
     this.initialTime = data.initialTime ?? 0;
     this.cumulativeTime = this.initialTime + this.time;
   }
@@ -36,7 +37,7 @@ export default class Transfer
 
   // Copy the transfer
   _copy(modifiedProps = {}) {
-    return new Transfer(this._feed, {...this, ...modifiedProps});
+    return new Transfer(this._feed, this.id, {...this, ...modifiedProps});
   }
 
   // Align the transfer to the specified node
@@ -64,11 +65,11 @@ export default class Transfer
   toJSON() {
     return {
       id: this.id,
-      nodes: [this.between.toJSON(), this.and.toJSON()],
+      between: this.between.toJSON(), 
+      and: this.and.toJSON(),
       time: this.time,
       direct: this.direct,
       icon: this.icon,
-      oppositeNode: this.oppositeNode,
     };
   }
 }

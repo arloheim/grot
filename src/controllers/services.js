@@ -28,7 +28,7 @@ export function createServicesRouter(app) {
   // Add the list services route
   router.get('/', catchError(async function(req, res, next) {
     // Get the services
-    const services = app.locals.feed.services;
+    const services = app.locals.feed.getServices();
 
     // Respond with the services
     return res.json(services.map(service => service.toJSON()));

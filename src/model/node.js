@@ -1,11 +1,13 @@
+import Record from "./record.js";
+
+
 // Class that defines a node in a feed
-export default class Node
+export default class Node extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
+  constructor(feed, id, data) {
+    super(feed, "nodes", id);
 
-    this.id = data.id;
     this.slug = data.slug;
     this.name = data.name;
     this.code = data.code;
@@ -28,21 +30,21 @@ export default class Node
 
   // Return the routes that have a stop at the node
   get routes() {
-    return this._feed.routes
+    return this._feed.getRoutes()
       .filter(route => route.getStopsAtNode(this).length > 0)
       .flatMap(this._addStopsToRoute.bind(this));
   }
 
   // Return the transfers that include the node
   get transfers() {
-    return this._feed.transfers
+    return this._feed.getTransfers()
       .filter(transfer => transfer.includesNode(this))
       .flatMap(this._addOppositeNodeToTransfer.bind(this));
   }
 
   // Return the notifications that affect the node
   get notifications() {
-    return this._feed.notifications
+    return this._feed.getNotifications()
       .filter(notification => notification.affectsNode(this));
   }
 
@@ -58,8 +60,7 @@ export default class Node
 
   // Add the opposite node to a transfer of a node
   _addOppositeNodeToTransfer(transfer) {
-    transfer.oppositeNode = transfer.getOppositeNode(this);
-    return transfer;
+    return transfer._alignToNode(this);
   }
 
 

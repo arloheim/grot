@@ -28,7 +28,7 @@ export function createNodeRouter(app) {
   // Add the list nodes route
   router.get('/', catchError(async function(req, res, next) {
     // Get the nodes
-    const nodes = app.locals.feed.nodes;
+    const nodes = app.locals.feed.getNodes();
 
     // Respond with the nodes
     return res.json(nodes.map(node => node.toJSON()));

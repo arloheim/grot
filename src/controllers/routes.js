@@ -28,7 +28,7 @@ export function createRoutesRouter(app) {
   // Add the list routes route
   router.get('/', catchError(async function(req, res, next) {
     // Get the routes
-    const routes = app.locals.feed.routes;
+    const routes = app.locals.feed.getRoutes();
 
     // Respond with the routes
     return res.json(routes.map(route => route.toJSON()));

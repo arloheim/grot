@@ -1,11 +1,13 @@
+import Record from "./record.js";
+
+
 // Class that defines a route in a feed
-export default class Route
+export default class Route extends Record
 {
   // Constructor
-  constructor(feed, data) {
-    this._feed = feed;
-
-    this.id = data.id;
+  constructor(feed, id, data) {
+    super(feed, "routes", id);
+    
     this.slug = data.slug;
     this.name = data.name;
     this.abbr = data.abbr;
@@ -53,7 +55,7 @@ export default class Route
 
   // Return the notifications that affect the route
   get notifications() {
-    return this._feed.notifications
+    return this._feed.getNotifications()
       .filter(notification => notification.affectsRoute(this))
   }
 
@@ -81,7 +83,7 @@ export default class Route
 
   // Copy the route
   _copy(modifiedProps = {}) {
-    return new Route(this._feed, {...this, ...modifiedProps});
+    return new Route(this._feed, this.id, {...this, ...modifiedProps});
   }
 
   // Slice the route to begin at the specified sequence
