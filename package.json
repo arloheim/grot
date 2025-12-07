@@ -1,0 +1,27 @@
+{
+  "type": "module",
+  "name": "@arloheim/grot",
+  "version": "0.1.0",
+  "description": "GregoRail-compatible transit feed specification for Minecraft worlds",
+  "author": "Danae Dekker <hello@danaedekker.com>",
+  "license": "GPL-3.0-or-later",
+  "main": "src/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arloheim/grot.git"
+  },
+  "scripts": {
+    "dev": "nodemon src/main.js"
+  },
+  "dependencies": {
+    "cors": "~2.8.5",
+    "express": "~5.2.1",
+    "http-errors": "~2.0.1",
+    "minisearch": "~7.2.0",
+    "toml": "^3.0.0",
+    "winston": "~3.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "~3.1.11"
+  }
+}
