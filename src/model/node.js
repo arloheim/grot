@@ -1,4 +1,5 @@
 import Record from "./record.js";
+import FeedError from "./exception.js";
 
 
 // Class that defines a node in a feed
@@ -6,44 +7,64 @@ export default class Node extends Record
 {
   // Constructor
   constructor(feed, id, data) {
-    super(feed, "nodes", id);
+    super(feed, id);
 
-    this.slug = data.slug;
+    if (!('name' in data))
+      throw new FeedError(`Missing required field "name" in node with id "${this.id}"`);
+
+    this.code = data.code ?? null;
     this.name = data.name;
-    this.code = data.code;
-    this.abbr = data.abbr;
-    this.description = data.description;
-    this.url = data.url;
-    this.modality = data.modality;
+    this.abbr = data.abbr ?? null;
+    this.description = data.description ?? null;
+    this.url = data.url ?? null;
+    this.city = data.city ?? null;
+    this.modality = data.modality ?? null;
     this.icon = data.icon ?? this.modality?.icon ?? 'location-dot';
-    this.city = data.city;
-    this.x = data.x;
-    this.y = data.y;
+    this.x = data.x ?? null;
+    this.y = data.y ?? null;
     this.visible = data.visible ?? true;
+  }
+  
+  // Return the JSON representation of the node
+  toJSON(options) {
+    return {
+      id: this.id,
+      code: this.code,
+      name: this._feed.applyTranslation(this, 'name', options?.language),
+      abbr: this._feed.applyTranslation(this, 'abbr', options?.language),
+      description: this._feed.applyTranslation(this, 'description', options?.language),
+      url: this._feed.applyTranslation(this, 'url', options?.language),
+      city: this._feed.applyTranslation(this, 'city', options?.language),
+      modality: this.modality?.toJSON(options),
+      icon: this.icon,
+      x: this.x,
+      y: this.y,
+      visible: this.visible,
+    }
   }
 
 
   // Return the services for the node
-  get services() {
+  getServices() {
     return this._feed.getNodeServices(this.id);
   }
 
   // Return the routes that have a stop at the node
-  get routes() {
+  getRoutes() {
     return this._feed.getRoutes()
       .filter(route => route.getStopsAtNode(this).length > 0)
       .flatMap(this._addStopsToRoute.bind(this));
   }
 
   // Return the transfers that include the node
-  get transfers() {
+  getTransfers() {
     return this._feed.getTransfers()
       .filter(transfer => transfer.includesNode(this))
-      .flatMap(this._addOppositeNodeToTransfer.bind(this));
+      .flatMap(transfer => transfer._alignToNode(this));
   }
 
   // Return the notifications that affect the node
-  get notifications() {
+  getNotifications() {
     return this._feed.getNotifications()
       .filter(notification => notification.affectsNode(this));
   }
@@ -56,30 +77,5 @@ export default class Node extends Record
       stopRoute.stopAtNode = stop;
       return stopRoute;
     });
-  }
-
-  // Add the opposite node to a transfer of a node
-  _addOppositeNodeToTransfer(transfer) {
-    return transfer._alignToNode(this);
-  }
-
-
-  // Return the JSON representation of the node
-  toJSON() {
-    return {
-      id: this.id,
-      slug: this.slug,
-      name: this.name,
-      code: this.code ?? null,
-      abbr: this.abbr ?? null,
-      description: this.description ?? null,
-      url: this.url ?? null,
-      modality: this.modality?.toJSON(),
-      icon: this.icon,
-      city: this.city ?? null,
-      x: this.x ?? null,
-      y: this.y ?? null,
-      visible: this.visible,
-    }
   }
 }

@@ -27,17 +27,23 @@ export function createNotificationsRouter(app) {
 
   // Add the list notifications route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the notifications
     const notifications = app.locals.feed.getNotifications();
 
     // Respond with the notifications
-    return res.json(notifications.map(notification => notification.toJSON()));
+    return res.json(notifications.map(notification => notification.toJSON({language})));
   }));
 
   // Add the get notification route
   router.get('/:notificationId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the notification
-    return res.json(req._notification.toJSON());
+    return res.json(req._notification.toJSON({language}));
   }));
 
   // Return the router

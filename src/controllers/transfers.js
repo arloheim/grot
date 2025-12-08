@@ -27,8 +27,11 @@ export function createTransfersRouter(app) {
 
   // Add the list transfers route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+    
     // Get the transfers
-    const transfers = app.locals.feed.getTransfers();
+    const transfers = app.locals.feed.getTransfers({language});
 
     // Respond with the transfers
     return res.json(transfers.map(transfer => transfer.toJSON()));
@@ -36,8 +39,11 @@ export function createTransfersRouter(app) {
 
   // Add the get transfer route
   router.get('/:transferId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the transfer
-    return res.json(req._transfer.toJSON());
+    return res.json(req._transfer.toJSON({language}));
   }));
 
   // Return the router

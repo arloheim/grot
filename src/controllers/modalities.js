@@ -27,17 +27,23 @@ export function createModalityRouter(app) {
 
   // Add the list modalities route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the modalities
     const modalities = app.locals.feed.getModalities();
 
     // Respond with the modalities
-    return res.json(modalities.map(modality => modality.toJSON()));
+    return res.json(modalities.map(modality => modality.toJSON({language})));
   }));
 
   // Add the get modality route
   router.get('/:modalityId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the modality
-    return res.json(req._modality.toJSON());
+    return res.json(req._modality.toJSON({language}));
   }));
 
   // Return the router

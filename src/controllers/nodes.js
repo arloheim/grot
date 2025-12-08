@@ -27,62 +27,68 @@ export function createNodeRouter(app) {
 
   // Add the list nodes route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the nodes
     const nodes = app.locals.feed.getNodes();
 
     // Respond with the nodes
-    return res.json(nodes.map(node => node.toJSON()));
-  }));
-
-  // Add the search nodes route
-  router.get('/search', catchError(async function(req, res, next) {
-    // Search for the nodes
-    const nodes = app.locals.feed.searchNodes(req.query.q);
-
-    // Respond with the nodes
-    return res.json(nodes.map(node => node.toJSON()));
+    return res.json(nodes.map(node => node.toJSON({language})));
   }));
 
   // Add the get node route
   router.get('/:nodeId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the node
-    return res.json(req._node.toJSON());
+    return res.json(req._node.toJSON({language}));
   }));
 
   // Add the get node routes route
   router.get('/:nodeId/routes', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the routes
-    const routes = req._node.routes;
+    const routes = req._node.getRoutes();
 
     // Respond with the routes
-    return res.json(routes.map(route => route.toJSON()));
+    return res.json(routes.map(route => route.toJSON({language})));
   }));
 
   // Add the get node transfers route
   router.get('/:nodeId/transfers', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the transfers
-    const transfers = req._node.transfers;
+    const transfers = req._node.getTransfers();
 
     // Respond with the transfers
-    return res.json(transfers.map(transfer => transfer.toJSON()));
+    return res.json(transfers.map(transfer => transfer.toJSON({language})));
   }));
 
   // Add the get node services route
   router.get('/:nodeId/services', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the services
-    const services = req._node.services;
+    const services = req._node.getServices();
 
     // Respond with the services
-    return res.json(services.toJSON());
+    return res.json(services.toJSON({language}));
   }));
 
   // Add the get node notifications route
   router.get('/:nodeId/notifications', catchError(async function(req, res, next) {
-    // Get the notifications
-    const notifications = req._node.notifications;
+    // Parse the query
+    const {language} = req.query;
 
     // Respond with the notifications
-    return res.json(notifications.map(notification => notification.toJSON()));
+    return res.json(notifications.map(notification => notification.toJSON({language})));
   }));
 
   // Return the router

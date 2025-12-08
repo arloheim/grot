@@ -27,39 +27,54 @@ export function createRoutesRouter(app) {
 
   // Add the list routes route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the routes
     const routes = app.locals.feed.getRoutes();
 
     // Respond with the routes
-    return res.json(routes.map(route => route.toJSON()));
+    return res.json(routes.map(route => route.toJSON({language})));
   }));
 
   // Add the get route route
   router.get('/:routeId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+    
     // Respond with the route
-    return res.json(req._route.toJSON());
+    return res.json(req._route.toJSON({language}));
   }));
 
   // Add the get route services route
   router.get('/:routeId/services', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the services
-    const services = req._route.services;
+    const services = req._route.getServices();
 
     // Respond with the services
-    return res.json(services.toJSON());
+    return res.json(services.toJSON({language}));
   }));
 
   // Add the get route notifications route
   router.get('/:routeId/notifications', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the notifications
-    const notifications = req._route.notifications;
+    const notifications = req._route.getNotifications();
 
     // Respond with the notifications
-    return res.json(notifications.map(notification => notification.toJSON()));
+    return res.json(notifications.map(notification => notification.toJSON({language})));
   }));
 
   // Add the get route notifications route
   router.get('/:routeId/stops/:nodeId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the node
     req._node = app.locals.feed.getNode(req.params.nodeId);
     if (req._node === undefined)
@@ -69,7 +84,7 @@ export function createRoutesRouter(app) {
     const stops = req._route.getStopsAtNode(req._node);
 
     // Respond with the stops
-    return res.json(stops.map(stop => stop.toJSON()));
+    return res.json(stops.map(stop => stop.toJSON({language})));
   }));
 
   // Return the router

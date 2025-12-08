@@ -2,6 +2,7 @@ import express from 'express';
 import httpError from 'http-errors';
 
 import { catchError } from '../middleware.js';
+import { createFilter } from '../utils/filters.js';
 
 
 // Create the router for agencies
@@ -27,26 +28,35 @@ export function createAgencyRouter(app) {
 
   // Add the list agencies route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the agencies
     const agencies = app.locals.feed.getAgencies();
 
     // Respond with the agencies
-    return res.json(agencies.map(agency => agency.toJSON()));
+    return res.json(agencies.map(agency => agency.toJSON({language})));
   }));
 
   // Add the get agency route
   router.get('/:agencyId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the agency
-    return res.json(req._agency.toJSON());
+    return res.json(req._agency.toJSON({language}));
   }));
 
   // Add the list agency routes route
   router.get('/:agencyId/routes', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Get the routes
-    const routes = req._agency.routes;
+    const routes = req._agency.getRoutes();
 
     // Respond with the routes
-    return res.json(routes.map(route => route.toJSON()));
+    return res.json(routes.map(route => route.toJSON({language})));
   }));
 
   // Return the router

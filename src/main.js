@@ -3,6 +3,8 @@ import http from 'http';
 import { createApp, createLogger } from './app.js'
 import { parseFeed, ParserError } from './parser.js';
 
+import FeedError from './model/exception.js';
+
 
 // Main function
 async function main() {
@@ -18,7 +20,7 @@ async function main() {
     logger.info(`Loaded transit feed version ${feed.version} published by ${feed.publisherName}${feed.publisherUrl !== undefined ? ` <${feed.publisherUrl}>` : ""}`)
     logger.info(`- Required files: ${feed.agencies.size} agencies, ${feed.modalities.size} modalities, ${feed.nodes.size} nodes, ${feed.routes.size} routes`);
     logger.info(`- Optional files: ${feed.services.size} services, ${feed.nodeServices.size} node services, ${feed.routeServices.size} route services, ${feed.notificationTypes.size} notification types, ${feed.notifications.size} notifications`);
-    logger.info(`- Language: "${feed.language}"${Object.keys(feed.translations).length > 0 ? `; Translations: ${Object.keys(feed.translations).map(id => `"${id}"`).join(", ")}` : ""}`);
+    logger.info(`- Language: "${feed.language}"${feed.translations.size > 0 ? `; Translations: ${[...feed.translations.keys()].map(id => `"${id}"`).join(", ")}` : ""}`);
 
     // Create the app
     const app = createApp(logger, feed);
@@ -71,7 +73,7 @@ async function main() {
     server.listen(8080);
   } catch (e) {
     // Check if the error is a parser error
-    if (e instanceof ParserError) {
+    if (e instanceof ParserError || e instanceof FeedError) {
       // Log the parser error
       logger.error(e);
     } else {

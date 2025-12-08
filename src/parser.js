@@ -21,33 +21,31 @@ import Translation from './model/translation.js';
 // Parse a feed from a set of TOML files a tthe specified base path
 export async function parseFeed(logger, basePath) {
   // Parse the feed file
-  const feedData = await _readFile(logger, null, path.join(basePath, 'feed.toml'));
+  const feedData = await readFile(logger, null, path.join(basePath, 'feed.toml'));
 
   // Create the feed
   const feed = new Feed(feedData);
 
   // Parse the files
-  feed.agencies = await _readFile(logger, feed, path.join(basePath, 'agencies.toml'), _parseAgency);
-  feed.modalities = await _readFile(logger, feed, path.join(basePath, 'modalities.toml'), _parseModality);
-  feed.nodes = await _readFile(logger, feed, path.join(basePath, 'nodes.toml'), _parseNode);
-  feed.routes = await _readFile(logger, feed, path.join(basePath, 'routes.toml'), _parseRoute);
-  feed.transfers = await _readFile(logger, feed, path.join(basePath, 'transfers.toml'), _parseTransfer);
-  feed.services = await _readFile(logger, feed, path.join(basePath, 'services.toml'), _parseService);
-  feed.nodeServices = await _readFile(logger, feed, path.join(basePath, 'node_services.toml'), _parseNodeServiceArray);
-  feed.routeServices = await _readFile(logger, feed, path.join(basePath, 'route_services.toml'), _parseRouteServiceArray);
-  feed.notificationTypes = await _readFile(logger, feed, path.join(basePath, 'notification_types.toml'), _parseNotificationType);
-  feed.notifications = await _readFile(logger, feed, path.join(basePath, 'notifications.toml'), _parseNotification);
-  feed.translations = await _readFile(logger, feed, path.join(basePath, 'translations.toml'), _parseTranslation);
-
-  // Create the node search index
-  feed._createNodesSearchIndex();
+  feed.agencies = await readFile(logger, feed, path.join(basePath, 'agencies.toml'), parseAgency);
+  feed.modalities = await readFile(logger, feed, path.join(basePath, 'modalities.toml'), parseModality);
+  feed.nodes = await readFile(logger, feed, path.join(basePath, 'nodes.toml'), parseNode);
+  feed.routes = await readFile(logger, feed, path.join(basePath, 'routes.toml'), parseRoute);
+  feed.transfers = await readFile(logger, feed, path.join(basePath, 'transfers.toml'), parseTransfer);
+  feed.services = await readFile(logger, feed, path.join(basePath, 'services.toml'), parseService);
+  feed.nodeServices = await readFile(logger, feed, path.join(basePath, 'node_services.toml'), parseNodeServiceArray);
+  feed.routeServices = await readFile(logger, feed, path.join(basePath, 'route_services.toml'), parseRouteServiceArray);
+  feed.notificationTypes = await readFile(logger, feed, path.join(basePath, 'notification_types.toml'), parseNotificationType);
+  feed.notifications = await readFile(logger, feed, path.join(basePath, 'notifications.toml'), parseNotification);
+  feed.translations = await readFile(logger, feed, path.join(basePath, 'translations.toml'), parseTranslation);
+  feed._postLoad();
 
   return feed;
 }
 
 
 // Read and parse the TOML file at the specified path
-async function _readFile(logger, data, path, parser = undefined, options = {}) {
+async function readFile(logger, data, path, parser = undefined, options = {}) {
   try {
     // Read and parse the TOML file
     const file = await fs.readFile(path, 'utf-8');
@@ -55,7 +53,7 @@ async function _readFile(logger, data, path, parser = undefined, options = {}) {
 
     // Parse the entries
     if (parser !== undefined)
-      return new Map(_parseToMap(entries, (key, value) => parser(logger, data, key, value)));
+      return new Map(parseToMap(entries, (key, value) => parser(logger, data, key, value)));
     else
       return entries;
   } catch (e) {
@@ -73,7 +71,7 @@ async function _readFile(logger, data, path, parser = undefined, options = {}) {
 }
 
 // Parses an object into a map using the specified callback function
-function _parseToMap(object, callbackFn) {
+function parseToMap(object, callbackFn) {
   const keys = Object.keys(object);
   const map = new Map();
   for (let i = 0; i < keys.length; i++) {
@@ -85,80 +83,83 @@ function _parseToMap(object, callbackFn) {
 
 
 // Parse an agency from an object
-function _parseAgency(logger, feed, id, agency) {
+function parseAgency(logger, feed, id, agencyData) {
   // Create a new agency
-  return new Agency(feed, id, agency);
+  return new Agency(feed, id, agencyData);
 }
 
 // Parse a modality from an object
-function _parseModality(logger, feed, id, modality) {
+function parseModality(logger, feed, id, modalityData) {
   // Create a new modality
-  return new Modality(feed, id, modality);
+  return new Modality(feed, id, modalityData);
 }
 
 // Parse a node from an object
-function _parseNode(logger, feed, id, node) {
+function parseNode(logger, feed, id, nodeData) {
   // Fetch the modality of the node
-  if (node.modality !== undefined) {
-    node.modality = feed.getModality(node.modality);
-    if (node.modality === undefined)
-      logger.warn(`Undefined modality "${node.modality}" in node with id "${id}"`);
+  if (nodeData.modality !== undefined) {
+    nodeData.modality = feed.getModality(nodeData.modality);
+    if (nodeData.modality === undefined)
+      logger.warn(`Undefined modality "${nodeData.modality}" in node with id "${id}"`);
   }
 
   // Create a new node
-  return new Node(feed, id, node);
+  return new Node(feed, id, nodeData);
 }
 
 // Parse a route from an object
-function _parseRoute(logger, feed, id, route) {
+function parseRoute(logger, feed, id, routeData) {
   // Fetch the agency of the route
-  route.agency = feed.getAgency(route.agency);
-  if (route.agency === undefined)
-    logger.warn(`Undefined agency "${route.agency}" in route with id "${id}"`);
+  routeData.agency = feed.getAgency(routeData.agency);
+  if (routeData.agency === undefined)
+    logger.warn(`Undefined agency "${routeData.agency}" in route with id "${id}"`);
 
   // Fetch the modality of the route
-  route.modality = feed.getModality(route.modality);
-  if (route.modality === undefined)
-    logger.warn(`Undefined modality "${route.modality}" in route with id "${id}"`);
-
-  // Parse the stops of the route
-  route.stops = [..._parseToMap(route.stops, (value, key) => _parseRouteStop(logger, feed, value, key)).values()].toSorted((a, b) => a.sequence - b.sequence);
+  routeData.modality = feed.getModality(routeData.modality);
+  if (routeData.modality === undefined)
+    logger.warn(`Undefined modality "${routeData.modality}" in route with id "${id}"`);
 
   // Create a new route
-  return new Route(feed, id, route);
+  const route = new Route(feed, id, routeData);
+
+  // Parse the stops of the route
+  route.stops = [...parseToMap(routeData.stops, (value, key) => parseRouteStop(logger, feed, route, value, key)).values()].toSorted((a, b) => a.sequence - b.sequence);
+  route._postLoad();
+
+  return route;
 }
 
 // Parse a route stop from an object
-function _parseRouteStop(logger, feed, sequence, stop) {
+function parseRouteStop(logger, feed, route, sequence, stopData) {
   // Fetch the node of the route stop
-  stop.node = feed.getNode(stop.node);
+  stopData.node = feed.getNode(stopData.node);
 
   // Create a new route stop
-  return new RouteStop(feed, {sequence, ...stop});
+  return new RouteStop(feed, route, sequence, stopData);
 }
 
 // Parse a transfer from an object
-function _parseTransfer(logger, feed, id, transfer) {
+function parseTransfer(logger, feed, id, transferData) {
   // Fetch the nodes of the transfer
-  transfer.between = feed.getNode(transfer.between);
-  transfer.and = feed.getNode(transfer.and);
+  transferData.from = feed.getNode(transferData.from);
+  transferData.to = feed.getNode(transferData.to);
 
   // Create a new transfer
-  return new Transfer(feed, id, transfer);
+  return new Transfer(feed, id, transferData);
 }
 
 // Parse a service type from an object
-function _parseService(logger, feed, id, service) {
+function parseService(logger, feed, id, serviceData) {
   // Fetch the agency of the service
-  if (service.agency !== undefined)
-    service.agency = feed.getAgency(service.agency);
+  if (serviceData.agency !== undefined)
+    serviceData.agency = feed.getAgency(serviceData.agency);
 
   // Create a new service
-  return new Service(feed, id, service);
+  return new Service(feed, id, serviceData);
 }
 
 // Parse an array of node services from an array
-function _parseNodeServiceArray(logger, feed, id, services) {
+function parseNodeServiceArray(logger, feed, id, services) {
   // Fetch the node and services of the service collection
   const node = feed.nodes[id];
   services = services.map(service => feed.getService(service));
@@ -168,7 +169,7 @@ function _parseNodeServiceArray(logger, feed, id, services) {
 }
 
 // Parse an array of route services from an array
-function _parseRouteServiceArray(logger, feed, id, services) {
+function parseRouteServiceArray(logger, feed, id, services) {
   // Fetch the route and services of the service collection
   const route = feed.routes[id];
   services = services.map(service => feed.getService(service));
@@ -178,26 +179,26 @@ function _parseRouteServiceArray(logger, feed, id, services) {
 }
 
 // Parse a notification type from an object
-function _parseNotificationType(logger, feed, id, notificationType) {
+function parseNotificationType(logger, feed, id, notificationTypeData) {
   // Create a new notification type
-  return new NotificationType(feed, id, notificationType);
+  return new NotificationType(feed, id, notificationTypeData);
 }
 
 // Parse a notification from an object
-function _parseNotification(logger, feed, id, notification) {
+function parseNotification(logger, feed, id, notificationData) {
   // Fetch the type, affected nodes, and affected routes of the notification
-  notification.type = feed.getNotificationType(notification.type);
-  notification.affectedNodes = notification.affectedNodes?.map(n => feed.getNode(n)) ?? [];
-  notification.affectedRoutes = notification.affectedRoutes?.map(r => feed.getRoute(r)) ?? [];
+  notificationData.type = feed.getNotificationType(notificationData.type);
+  notificationData.affectedNodes = notificationData.affectedNodes?.map(n => feed.getNode(n)) ?? [];
+  notificationData.affectedRoutes = notificationData.affectedRoutes?.map(r => feed.getRoute(r)) ?? [];
 
   // Create a new notification
-  return new Notification(feed, id, notification);
+  return new Notification(feed, id, notificationData);
 }
 
 // Parse a translation from an object
-function _parseTranslation(logger, feed, id, translation) {
+function parseTranslation(logger, feed, id, table) {
   // Create a new translation
-  return new Translation(feed, id, translation);
+  return new Translation(feed, id, table);
 }
 
 

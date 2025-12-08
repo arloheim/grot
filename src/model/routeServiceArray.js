@@ -8,7 +8,7 @@ export default class RouteServiceArray
   }
 
   // Return the JSON representation of the route service array
-  toJSON() {
-    return this.services.map(service => service.toJSON());
+  toJSON(options) {
+    return this.services.map(service => service.toJSON(options));
   }
 }

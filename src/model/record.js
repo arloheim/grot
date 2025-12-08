@@ -1,11 +1,9 @@
-// Class that defines a record in a fed
+// Class that defines a record in a feed
 export default class Record
 {
   // Constructor
-  constructor(feed, collection, id) {
-    this._feed = feed;
-    this._collection = collection;
-    
+  constructor(feed, id) {
+    this._feed = feed;    
     this.id = id;
   }
 }

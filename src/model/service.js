@@ -6,23 +6,25 @@ export default class Service extends Record
 {
   // Constructor
   constructor(feed, id, data) {
-    super(feed, "services", id);
+    super(feed, id);
+    
+    if (!('name' in data))
+      throw new FeedError(`Missing required field "name" in service with id "${this.id}"`);
     
     this.name = data.name;
-    this.icon = data.icon;
-    this.color = data.color;
-    this.agency = data.agency;
+    this.icon = data.icon ?? null;
+    this.color = data.color ?? null;
+    this.agency = data.agency ?? null;
   }
 
-
   // Return the JSON representation of the type
-  toJSON() {
+  toJSON(options) {
     return {
       id: this.id,
-      name: this.name,
-      icon: this.icon ?? null,
-      color: this.color ?? null,
-      agency: this.agency?.toJSON(),
+      name: this._feed.applyTranslation(this, 'name', options?.language),
+      icon: this.icon,
+      color: this.color,
+      agency: this.agency?.toJSON(options),
     };
   }
 }

@@ -27,17 +27,23 @@ export function createServicesRouter(app) {
 
   // Add the list services route
   router.get('/', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+    
     // Get the services
     const services = app.locals.feed.getServices();
 
     // Respond with the services
-    return res.json(services.map(service => service.toJSON()));
+    return res.json(services.map(service => service.toJSON({language})));
   }));
 
   // Add the get service route
   router.get('/:serviceId', catchError(async function(req, res, next) {
+    // Parse the query
+    const {language} = req.query;
+
     // Respond with the service
-    return res.json(req._service.toJSON());
+    return res.json(req._service.toJSON({language}));
   }));
 
   // Return the router

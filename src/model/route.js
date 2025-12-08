@@ -6,59 +6,91 @@ export default class Route extends Record
 {
   // Constructor
   constructor(feed, id, data) {
-    super(feed, "routes", id);
+    super(feed, id);
+
+    if (!('name' in data))
+      throw new FeedError(`Missing required field "name" in route with id "${this.id}"`);
+    if (!('agency' in data))
+      throw new FeedError(`Missing required field "agency" in route with id "${this.id}"`);
+    if (!('modality' in data))
+      throw new FeedError(`Missing required field "modality" in route with id "${this.id}"`);
+    if (!('headsign' in data))
+      throw new FeedError(`Missing required field "modality" in route with id "${this.id}"`);
+    if (!('stops' in data))
+      throw new FeedError(`Missing required field "stops" in route with id "${this.id}"`);
     
-    this.slug = data.slug;
     this.name = data.name;
-    this.abbr = data.abbr;
-    this.description = data.description;
-    this.url = data.url;
+    this.headsign = data.headsign;
+    this.abbr = data.abbr ?? null;
+    this.description = data.description ?? null;
+    this.url = data.url ?? null;
+    this.colors = {background: '#ffffff', text: '#000000', ...data.colors};
     this.agency = data.agency;
     this.modality = data.modality;
     this.icon = data.icon ?? this.modality?.icon;
-    this.headsign = data.headsign;
-    this.color = {background: '#ffffff', text: '#000000', ...data.color};
+    this.stops = data.stops;
     this.visible = data.visible ?? true;
-    this.stops = data.stops.map(s => s._copy());
 
     this.stopAtNode = undefined;
     this.initialTime = data.initialTime ?? 0;
+  }
+
+  // Finalize loading the route
+  _postLoad() {
+    // Copy the stops
+    this.stops = this.stops.map(s => s._copy());
 
     // Calculate cumulative time for the stops of the route
-    let lastHeadsign = this.headsign;
+    let lastHeadsignSequence = null;
     for (let [index, stop] of this.stops.entries()) {
       // Set the flags of the first and last stops
-      stop.first = index === 0;
-      stop.last = index === this.stops.length - 1;
+      stop._first = index === 0;
+      stop._last = index === this.stops.length - 1;
 
       // Set the time of the first stop
       stop.time = index > 0 ? stop.time : 0;
 
       // Calculate cumulative time for the stop
-      stop.cumulativeTime = (index > 0 ? this.stops[index - 1].cumulativeTime : this.initialTime) + stop.time;
+      stop._cumulativeTime = (index > 0 ? this.stops[index - 1]._cumulativeTime : this.initialTime) + stop.time;
 
-      // Set the headsign of the stop
-      if (stop.headsign !== undefined) {
-        stop.changedHeadsign = !stop.last && stop.headsign != lastHeadsign;
-        lastHeadsign = stop.headsign;
-      } else {
-        stop.headsign = lastHeadsign;
-      }
+      // Set the actual headsign sequence of the stop
+      if (stop.headsign !== null)
+        lastHeadsignSequence = stop.sequence;
+      stop._actualHeadsignSequence = lastHeadsignSequence;
     }
+  }
+
+  // Return the JSON representation of the route
+  toJSON(options) {
+    return {
+      id: this.id,
+      name: this._feed.applyTranslation(this, 'name', options?.language),
+      headsign: this._feed.applyTranslation(this, ['stops', this.stopAtNode?._actualHeadsignSequence, 'headsign'], options?.language)
+        ?? this._feed.applyTranslation(this, 'headsign', options?.language),
+      abbr: this._feed.applyTranslation(this, 'abbr', options?.language),
+      description: this._feed.applyTranslation(this, 'description', options?.language),
+      url: this._feed.applyTranslation(this, 'url', options?.language),
+      colors: this.colors,
+      agency: this.agency.toJSON(options),
+      modality: this.modality.toJSON(options),
+      icon: this.icon,
+      stops: this.stops.map(stop => stop.toJSON(options)),
+      stopAtNode: this.stopAtNode?.toJSON(options),
+      visible: this.visible,
+    };
   }
 
 
   // Return the services for the route
-  get services() {
+  getServices() {
     return this._feed.getRouteServices(this.id);
   }
 
   // Return the notifications that affect the route
-  get notifications() {
+  getNotifications() {
     return this._feed.getNotifications()
-      .filter(notification => notification.affectsRoute(this))
+      .filter(notification => notification.affectsRoute(this));
   }
-
 
   // Return the stop of the route with the specified sequence
   getStopWithSequence(sequence, excludeNonHalts = false) {
@@ -83,7 +115,9 @@ export default class Route extends Record
 
   // Copy the route
   _copy(modifiedProps = {}) {
-    return new Route(this._feed, this.id, {...this, ...modifiedProps});
+    const route = new Route(this._feed, this.id, {...this, ...modifiedProps});
+    route._postLoad();
+    return route;
   }
 
   // Slice the route to begin at the specified sequence
@@ -113,27 +147,5 @@ export default class Route extends Record
   // Apply an initial time to the route
   _withInitialTime(initialTime) {
     return this._copy({initialTime});
-  }
-
-
-  // Return the JSON representation of the route
-  toJSON() {
-    return {
-      id: this.id,
-      slug: this.slug,
-      name: this.name,
-      abbr: this.abbr,
-      description: this.description,
-      url: this.url,
-      agency: this.agency.toJSON(),
-      modality: this.modality.toJSON(),
-      modalityName: this.modalityName,
-      icon: this.icon,
-      headsign: this.stopAtNode?.headsign ?? this.headsign,
-      color: this.color,
-      visible: this.visible,
-      stops: this.stops.map(stop => stop.toJSON()),
-      stopAtNode: this.stopAtNode,
-    };
   }
 }
