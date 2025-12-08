@@ -1,9 +1,9 @@
-import Record from "./record.js";
-import FeedError from "./exception.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines an agency in a feed
-export default class Agency extends Record
+export class Agency extends Record
 {
   // Constructor
   constructor(feed, id, data) {

@@ -1,8 +1,9 @@
-import Record from "./record.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines a route in a feed
-export default class Route extends Record
+export class Route extends Record
 {
   // Constructor
   constructor(feed, id, data) {
@@ -44,14 +45,14 @@ export default class Route extends Record
     let lastHeadsignSequence = null;
     for (let [index, stop] of this.stops.entries()) {
       // Set the flags of the first and last stops
-      stop._first = index === 0;
-      stop._last = index === this.stops.length - 1;
+      stop.first = index === 0;
+      stop.last = index === this.stops.length - 1;
 
       // Set the time of the first stop
       stop.time = index > 0 ? stop.time : 0;
 
       // Calculate cumulative time for the stop
-      stop._cumulativeTime = (index > 0 ? this.stops[index - 1]._cumulativeTime : this.initialTime) + stop.time;
+      stop.cumulativeTime = (index > 0 ? this.stops[index - 1].cumulativeTime : this.initialTime) + stop.time;
 
       // Set the actual headsign sequence of the stop
       if (stop.headsign !== null)

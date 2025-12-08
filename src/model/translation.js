@@ -1,16 +1,16 @@
-import Agency from "./agency.js";
-import Modality from "./modality.js";
-import Node from "./node.js";
-import Notification from "./notification.js";
-import NotificationType from "./notificationType.js";
-import Route from "./route.js";
-import RouteStop from "./routeStop.js";
-import Service from "./service.js";
-import Transfer from "./transfer.js";
+import { Agency } from "./agency.js";
+import { Modality } from "./modality.js";
+import { Node } from "./node.js";
+import { Notification } from "./notification.js";
+import { NotificationType } from "./notificationType.js";
+import { Route } from "./route.js";
+import { RouteStop } from "./routeStop.js";
+import { Service } from "./service.js";
+import { Transfer } from "./transfer.js";
 
 
 // Class that defines a translation in a feed
-export default class Translation
+export class Translation
 {
   // Constructor
   constructor(feed, id, table) {

@@ -1,5 +1,5 @@
 // Class that defines an array of route services
-export default class RouteServiceArray
+export class RouteServiceArray
 {
   // Constructor
   constructor(route, services) {

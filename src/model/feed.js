@@ -2,7 +2,7 @@ import MiniSearch from 'minisearch';
 
 
 // Class that defines a feed
-export default class Feed
+export class Feed
 {
   // Constructor
   constructor(data) {

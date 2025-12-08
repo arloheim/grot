@@ -1,9 +1,9 @@
-import Record from "./record.js";
-import FeedError from "./exception.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines a node in a feed
-export default class Node extends Record
+export class Node extends Record
 {
   // Constructor
   constructor(feed, id, data) {
@@ -50,9 +50,9 @@ export default class Node extends Record
   }
 
   // Return the routes that have a stop at the node
-  getRoutes() {
+  getRoutes(excludeNonHalts = false) {
     return this._feed.getRoutes()
-      .filter(route => route.getStopsAtNode(this).length > 0)
+      .filter(route => route.getStopsAtNode(this, excludeNonHalts).length > 0)
       .flatMap(this._addStopsToRoute.bind(this));
   }
 

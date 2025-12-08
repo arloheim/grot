@@ -1,5 +1,5 @@
 // Class that defines an array of node services
-export default class NodeServiceArray
+export class NodeServiceArray
 {
   // Constructor
   constructor(node, services) {

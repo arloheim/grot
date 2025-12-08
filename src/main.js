@@ -2,8 +2,7 @@ import http from 'http';
 
 import { createApp, createLogger } from './app.js'
 import { parseFeed, ParserError } from './parser.js';
-
-import FeedError from './model/exception.js';
+import { FeedError } from './model/exception.js';
 
 
 // Main function

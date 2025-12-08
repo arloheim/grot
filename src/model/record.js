@@ -1,5 +1,5 @@
 // Class that defines a record in a feed
-export default class Record
+export class Record
 {
   // Constructor
   constructor(feed, id) {

@@ -1,9 +1,9 @@
-import Record from "./record.js";
-import FeedError from "./exception.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines a modality in a feed
-export default class Modality extends Record
+export class Modality extends Record
 {
   // Constructor
   constructor(feed, id, data) {

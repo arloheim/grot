@@ -3,19 +3,19 @@ import path from 'path';
 
 import { load as parseToml, SyntaxParseError } from 'js-toml';
 
-import Feed from './model/feed.js';
-import Agency from './model/agency.js';
-import Modality from './model/modality.js';
-import Node from './model/node.js';
-import Transfer from './model/transfer.js';
-import Route from './model/route.js';
-import RouteStop from './model/routeStop.js';
-import Service from './model/service.js';
-import NodeServiceArray from './model/nodeServiceArray.js';
-import RouteServiceArray from './model/routeServiceArray.js';
-import NotificationType from './model/notificationType.js';
-import Notification from './model/notification.js';
-import Translation from './model/translation.js';
+import { Agency } from "./model/agency.js";
+import { Feed } from './model/feed.js';
+import { Modality } from "./model/modality.js";
+import { Node } from "./model/node.js";
+import { NodeServiceArray } from './model/nodeServiceArray.js';
+import { Notification } from "./model/notification.js";
+import { NotificationType } from "./model/notificationType.js";
+import { Route } from "./model/route.js";
+import { RouteServiceArray } from './model/routeServiceArray.js';
+import { RouteStop } from "./model/routeStop.js";
+import { Service } from "./model/service.js";
+import { Transfer } from "./model/transfer.js";
+import { Translation } from './model/translation.js';
 
 
 // Parse a feed from a set of TOML files a tthe specified base path

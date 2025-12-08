@@ -1,4 +1,5 @@
-export default class FeedError extends Error
+// Class that defines a feed error
+export class FeedError extends Error
 {
   // Constructor
   constructor(message, options) {

@@ -1,9 +1,9 @@
-import Record from "./record.js";
-import FeedError from "./exception.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines a notification in a feed
-export default class Notification extends Record
+export class Notification extends Record
 {
   // Constructor
   constructor(feed, id, data) {

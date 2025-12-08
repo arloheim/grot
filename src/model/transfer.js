@@ -1,8 +1,9 @@
-import Record from "./record.js";
+import { Record } from "./record.js";
+import { FeedError } from "./exception.js";
 
 
 // Class that defines a transfer in a feed
-export default class Transfer extends Record
+export class Transfer extends Record
 {
   // Constructor
   constructor(feed, id, data) {
@@ -22,7 +23,7 @@ export default class Transfer extends Record
     this.direct = data.direct ?? true;
 
     this.initialTime = data.initialTime ?? 0;
-    this._cumulativeTime = this.initialTime + this.time;
+    this.cumulativeTime = this.initialTime + this.time;
   }
   
   // Return the JSON representation of the transfer

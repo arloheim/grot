@@ -1,5 +1,5 @@
 // Class that defines a stop in a route
-export default class RouteStop
+export class RouteStop
 {
   // Constructor
   constructor(feed, route, sequence, data) {
@@ -18,10 +18,10 @@ export default class RouteStop
     this.alightDirection = data.alightDirection ?? null;
     this.status = data.status ?? null;
 
-    this._first = false;
-    this._last = false;
-    this._cumulativeTime = 0;
-    this._actualHeadsignSequence = undefined;
+    this.first = false;
+    this.last = false;
+    this.cumulativeTime = 0;
+    this.actualHeadsignSequence = undefined;
   }
 
   // Return the JSON representation of the route stop
@@ -32,8 +32,8 @@ export default class RouteStop
       time: this.time,
       halts: this.halts,
       platform: this.platform,
-      headsign: this._actualHeadsignSequence !== null
-        ? this._feed.applyTranslation(this._route.getStopWithSequence(this._actualHeadsignSequence), 'headsign', options?.language)
+      headsign: this.actualHeadsignSequence !== undefined
+        ? this._feed.applyTranslation(this._route.getStopWithSequence(this.actualHeadsignSequence), 'headsign', options?.language)
         : this._feed.applyTranslation(this._route, 'headsign', options?.language),
       alightDirection: this.alightDirection,
       status: this.status ?? null,
