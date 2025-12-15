@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import http from 'http';
 
 import { createApp, createLogger } from './app.js'
@@ -7,6 +9,9 @@ import { FeedError } from './model/exception.js';
 
 // Main function
 async function main() {
+  // Initialize Day.js
+  dayjs.extend(customParseFormat);
+
   // Create the logger
   const logger = createLogger();
 

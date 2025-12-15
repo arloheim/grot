@@ -13,17 +13,18 @@ export class Transfer extends Record
       throw new FeedError(`Missing required field "from" in transfer with id "${this.id}"`);
     if (!('to' in data))
       throw new FeedError(`Missing required field "to" in transfer with id "${this.id}"`);
-    if (!('time' in data))
-      throw new FeedError(`Missing required field "time" in transfer with id "${this.id}"`);
+    if (!('duration' in data))
+      throw new FeedError(`Missing required field "duration" in transfer with id "${this.id}"`);
     
     this.from = data.from;
     this.to = data.to;
-    this.time = data.time;
+    this.duration = data.duration;
     this.icon = data.icon ?? 'person-walking';
     this.direct = data.direct ?? true;
 
-    this.initialTime = data.initialTime ?? 0;
-    this.cumulativeTime = this.initialTime + this.time;
+    this._initialTime = data._initialTime ?? 0;
+    this._cumulativeTime = this._initialTime + this.duration;
+    this._journeyTime = undefined;
   }
   
   // Return the JSON representation of the transfer
@@ -32,9 +33,13 @@ export class Transfer extends Record
       id: this.id,
       from: this.from.toJSON(options), 
       to: this.to.toJSON(options),
-      time: this.time,
+      duration: this.duration,
+      formattedDuration: `${Math.floor(this.duration / 3600)}:${Math.floor(this.duration % 3600 / 60).toString().padStart(2, '0')}`,
       icon: this.icon,
       direct: this.direct,
+      
+      journeyTime: this._journeyTime?.format('YYYY-MM-DD[T]HH:mm:ss'),
+      formattedJourneyTime: this._journeyTime?.format('H:mm'),
     };
   }
 
@@ -61,22 +66,17 @@ export class Transfer extends Record
   }
 
   // Align the transfer to the specified node
-  _alignToNode(node) {
+  _alignToNode(node, modifiedProps = {}) {
     if (this.from.id === node.id)
-      return this._copy();
+      return this._copy(modifiedProps);
     else if (this.to.id === node.id)
-      return this._copy({from: this.to, to: this.from});
+      return this._copy({...modifiedProps, from: this.to, to: this.from});
     else
       return undefined;
   }
 
   // Align the transfer to the opposite node of the specified node
-  _alignToOppositeNode(node) {
-    return this._alignToNode(this.getOppositeNode(node));
-  }
-
-  // Apply an initial time to the transfer
-  _withInitialTime(initialTime) {
-    return this._copy({initialTime});
+  _alignToOppositeNode(node, modifiedProps = {}) {
+    return this._alignToNode(this.getOppositeNode(node), modifiedProps);
   }
 }

@@ -72,10 +72,7 @@ export class Node extends Record
 
   // Add the stops to a route that stops at a node
   _addStopsToRoute(route) {
-    return route.getStopsAtNode(this).map(stop => {
-      const stopRoute = route._sliceBeginningAtSequence(stop.sequence);
-      stopRoute.stopAtNode = stop;
-      return stopRoute;
-    });
+    return route.getStopsAtNode(this)
+      .map(stop => route._sliceBeginningAtSequence(stop.sequence, {_stopAtNode: stop}));
   }
 }

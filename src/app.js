@@ -10,6 +10,7 @@ import { createRoutesRouter } from "./controllers/routes.js";
 import { createTransfersRouter } from "./controllers/transfers.js";
 import { createServicesRouter } from "./controllers/services.js";
 import { createNotificationsRouter } from "./controllers/notifications.js";
+import { createPlannerRouter } from './controllers/planner.js';
 
 
 // Create the Winston logger
@@ -49,6 +50,7 @@ export function createApp(logger, feed) {
   app.use('/timetable/transfers', createTransfersRouter(app));
   app.use('/timetable/services', createServicesRouter(app));
   app.use('/timetable/notifications', createNotificationsRouter(app));
+  app.use('/planner', createPlannerRouter(app));
 
   // Add the error middleware to the app
   app.use(respondWithError(logger));
